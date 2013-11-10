@@ -1,0 +1,6 @@
+/*.txt
+/*.gch
+/*.pgm
+a.out
+!obst.pgm
+!no_obst.pgm
