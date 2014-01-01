@@ -2,6 +2,11 @@
 #include <string.h>
 #include <vector>
 #include <utility>
+#include <iostream>
+using std::vector;
+using std::pair;
+
+
 class PGMData{
  int xsize;
  int ysize;
@@ -10,16 +15,16 @@ class PGMData{
  bool loaded=0;
  bool writen=0;
  public:
-  PGMData();
+  PGMData(){};
   PGMData(const char * filename);
-  ~PGMData;
-  writeData(const char * filename);
+  ~PGMData();
+  void writeData(const char * filename);
   bool IsValidLocation(int ,int);
   bool AreValidLocations(vector<pair<int,int>>);
   void DrawPoint(int,int,int);
   void DrawPoints(vector<pair<int,int>>,int);
   void Print();
-}
+};
 PGMData::PGMData(const char * filename){
   char line[81],word[81];
 
@@ -52,7 +57,7 @@ PGMData::PGMData(const char * filename){
   //Read image data from file
 
   if (fread(image,sizeof(unsigned char),xsize*ysize,Handle)<xsize*ysize)  {
-    fclose(Handle); delete[] image; image=NULL; xsize=ysize=0; loaded=0 return;
+    fclose(Handle); delete[] image; image=NULL; xsize=ysize=0; loaded=0; return;
   }
 
   //Close file and return
@@ -62,7 +67,7 @@ PGMData::PGMData(const char * filename){
   return ;
 }
 
-int PGMData::writeData(const char *filename) {
+void PGMData::writeData(const char *filename) {
 
   //Open output file for writing
 
@@ -86,7 +91,7 @@ int PGMData::writeData(const char *filename) {
   return ;
 }
 PGMData::~PGMData(){
-  free(image);
+delete image;
 }
 
 bool PGMData::IsValidLocation(int x ,int y){
@@ -102,22 +107,22 @@ bool PGMData::AreValidLocations(vector<pair<int,int>> points){
   }
   return true;
 }
-void PGMData::DrawPoints(vector<pair<int,int>> points,int scale){
+void PGMData::DrawPoints(vector<pair<int,int>> points,int opacity){
   for( auto i : points){
-    DrawPoint(i.first,i.second,scale);
+    DrawPoint(i.first,i.second,opacity);
   }
   
 }
-void PGMData::DrawPoint(int x, int y, int scale){
-  image[ysize*y+x]=scale;
+void PGMData::DrawPoint(int x, int y, int opacity){
+  image[ysize*y+x]=opacity;
   
 }
 
-void Print(){
+void PGMData::Print(){
   for (int y=0;y<ysize;y++){
     for(int x=0;x<xsize;x++){
-      cout << image[y*ysize+x];
+      if((image[y*ysize+x])>64){std::cout << "*";}
     }
-    cout << "\n";
+    std::cout << "\n";
   }
 }
