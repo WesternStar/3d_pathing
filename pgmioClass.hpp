@@ -95,7 +95,7 @@ delete image;
 }
 
 bool PGMData::IsValidLocation(int x ,int y){
-  return image[ysize*y+x]!=255;
+  return image[xsize*y+x]!=255;
   
 }
 bool PGMData::AreValidLocations(vector<pair<int,int>> points){
@@ -114,14 +114,15 @@ void PGMData::DrawPoints(vector<pair<int,int>> points,int opacity){
   
 }
 void PGMData::DrawPoint(int x, int y, int opacity){
-  image[ysize*y+x]=opacity;
+  image[xsize*y+x]=opacity;
   
 }
 
 void PGMData::Print(){
   for (int y=0;y<ysize;y++){
     for(int x=0;x<xsize;x++){
-      if((image[y*ysize+x])>64){std::cout << "*";}
+      if((image[y*xsize+x])<64){std::cout << "*";}
+      else{std::cout <<" ";}
     }
     std::cout << "\n";
   }
