@@ -2,14 +2,16 @@
 #include <math.h>
 #include <iostream>
 using namespace std;
+
 template <typename T>
 struct point{
 T x,y;};
+
 class shape
 {
 public:
-	float x,y;
-	float theta; // Location 
+float x,y;
+float theta; // Location 
 virtual void drawOutline(unsigned char * image,int width,int height)=0;
 virtual bool isValidLocation(unsigned char * image,int width,int height)=0;
 virtual void setLocation(float x, float y, float theta){this->x=x;this->y=y;this->theta=theta;}
@@ -31,13 +33,20 @@ start.y=y;
 end.x=L*cos(this->theta)+start.x+0.5;
 end.y=L*sin(this->theta)+start.y+0.5;
 }
-void Set(float x, float y, float theta, int L){this->x=x; this->y=y; this->theta=(theta/180.0)*M_PI;
-	this->L=L; 
-	this->N=L*5;
+
+void Set(float x, float y, float theta, int L){
+
+this->x=x; 
+this->y=y; 
+this->theta=(theta/180.0)*M_PI;
+this->L=L; 
+this->N=L*5;
+
 start.x=x;
 start.y=y;
 end.x=L*cos(this->theta)+start.x+0.5;
 end.y=L*sin(this->theta)+start.y+0.5;}
+
 virtual bool isValidLocation(unsigned char * image,int width,int height){
 float x_increment = L*cos(theta)/N;
 float y_increment = L*sin(theta)/N;
@@ -64,6 +73,8 @@ for(int i=0; i<N;i++){
 	
 }
 };
+
+
 
 
 class Arc:shape{
@@ -161,7 +172,10 @@ d.drawOutline(image,width,height);
 }
 virtual bool isValidLocation(unsigned char * image,int width,int height){
 Init();
-return a.isValidLocation(image,width,height) && b.isValidLocation(image,width,height) && c.isValidLocation(image,width,height) && d.isValidLocation(image,width,height);
+return a.isValidLocation(image,width,height) && 
+       b.isValidLocation(image,width,height) && 
+       c.isValidLocation(image,width,height) && 
+       d.isValidLocation(image,width,height);
 }
 };
 class lens:public shape
@@ -236,12 +250,17 @@ public:
 		this->height=height;
 		C.Set(x,y,(theta/180.0)*M_PI,width);
 		D.Set(
-			x+width*cos(  ((theta/180.0) *M_PI))-height*sin(((theta/180.0)*M_PI)),
-			y+width*sin((theta/180.0)*M_PI)+height*cos(((theta/180.0)*M_PI)),
-			theta+180,width
-			);
-		A.Set( x + width*cos((theta/180.0)*M_PI) - height/2*sin((theta/180.0)*M_PI), y + width*sin((theta/180.0)*M_PI) + height/2*cos((theta/180.0)*M_PI)       ,theta-90,height/2.0,180);
-		B.Set(x - height/2*sin((theta/180.0)*M_PI),   y + height/2*cos((theta/180.0)*M_PI),      theta+90,height/2.0,180);
+		     	x+width*cos(  ((theta/180.0) *M_PI))-height*sin(((theta/180.0)*M_PI)),
+		 	y+width*sin((theta/180.0)*M_PI)+height*cos(((theta/180.0)*M_PI)),
+			theta+180,width);
+		A.Set(
+                         x + width*cos((theta/180.0)*M_PI) - height/2*sin((theta/180.0)*M_PI),
+                         y + width*sin((theta/180.0)*M_PI) + height/2*cos((theta/180.0)*M_PI),
+                         theta-90,height/2.0,180);
+		B.Set(
+                         x - height/2*sin((theta/180.0)*M_PI),
+                         y + height/2*cos((theta/180.0)*M_PI),
+                         theta+90,height/2.0,180);
 
 	}
 void Init(){
@@ -249,10 +268,16 @@ C.Set(x,y,theta,width);
 		D.Set(
 			x+width*cos(  ((theta/180.0) *M_PI))-height*sin(((theta/180.0)*M_PI)),
 			y+width*sin((theta/180.0)*M_PI)+height*cos(((theta/180.0)*M_PI)),
-			theta+180,width
-			);
-		A.Set( x + width*cos((theta/180.0)*M_PI) - height/2*sin((theta/180.0)*M_PI), y + width*sin((theta/180.0)*M_PI) + height/2*cos((theta/180.0)*M_PI)       ,theta-90,height/2.0,180);
-		B.Set(x - height/2*sin((theta/180.0)*M_PI),   y + height/2*cos((theta/180.0)*M_PI),      theta+90,height/2.0,180);
+			theta+180,width);
+
+		A.Set( 
+                        x + width*cos((theta/180.0)*M_PI) - height/2*sin((theta/180.0)*M_PI), 
+                        y + width*sin((theta/180.0)*M_PI) + height/2*cos((theta/180.0)*M_PI),
+                        theta-90,height/2.0,180);
+		B.Set(
+                        x - height/2*sin((theta/180.0)*M_PI),   
+                        y + height/2*cos((theta/180.0)*M_PI),
+                        theta+90,height/2.0,180);
 
 
 }
@@ -271,7 +296,10 @@ void setParams(float width,float height){
 	}
 	bool isValidLocation(unsigned char * image,int width,int height){
 		Init();
-return (A.isValidLocation(image,width,height)&&B.isValidLocation(image,width,height)&& C.isValidLocation(image,width,height)&&D.isValidLocation(image,width,height));
+return (A.isValidLocation(image,width,height)&&
+        B.isValidLocation(image,width,height)&& 
+        C.isValidLocation(image,width,height)&&
+        D.isValidLocation(image,width,height));
 	
 	}
 };

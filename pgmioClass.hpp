@@ -5,7 +5,7 @@
 #include <iostream>
 using std::vector;
 using std::pair;
-
+const int debug=1;
 
 class PGMData{
  int xsize;
@@ -95,16 +95,34 @@ delete image;
 }
 
 bool PGMData::IsValidLocation(int x ,int y){
-  return image[xsize*y+x]!=255;
+  if(debug){
+    int opac=image[xsize*y+x];
+   std::cout << "IVL: Opacity"<< opac<< std::endl;
+   bool valid=opac!=0;
+   if(valid)
+      std::cout << "IVL:Valid Location\n";
+   else
+      std::cout << "IVL:Invalid Location\n";
+   return valid;
+  }
+  else{
+
+  return image[xsize*y+x]!=0;
+
+  }
   
 }
 bool PGMData::AreValidLocations(vector<pair<int,int>> points){
   for( auto i :points){
     if (IsValidLocation(i.first,i.second)){
     }else{
+      if(debug)
+        std::cout << "AVL:Invalid Location\n";
       return false;
     }
   }
+  if(debug)
+    std::cout << "AVL:Valid Location\n";
   return true;
 }
 void PGMData::DrawPoints(vector<pair<int,int>> points,int opacity){

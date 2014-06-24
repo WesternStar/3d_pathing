@@ -1,10 +1,11 @@
 #include <stdlib.h>      //Included for function exit()
 #include <fstream>       //Included for ifstream class
 #include <iostream>      //Included for ostream class (cout)
+#include "pgmioClass.hpp"
 #include "shape.h"
 
 using namespace std;
-
+unique_ptr<PGMData> Field;
 inline float rint(float x) {return float((int)(x+.5));}
 
 //Delcaration of functions to read/write pgm images
@@ -75,16 +76,14 @@ int main(int argc,char *argv[]) {
   }
 
   //Read input image (obstacles) and record grid dimensions
-
-  unsigned char *image;
-  int xsize, ysize;
-
-  if (!readPGM(argv[1],image,xsize,ysize)) {
+  PGMData image(argv[1]);
+  if (!image.loaded) {
     cout << "Error in reading input image: " << argv[1] << endl;
     exit(1);
   }
 
-  int gridsize=xsize*ysize;           //Total number of pixels in the grid
+  int gridsize=image.xsize*image.ysize;
+  //Total number of pixels in the grid
 
   //Open shape input file
 
@@ -144,7 +143,7 @@ int main(int argc,char *argv[]) {
   int *dist=new int[gridsize];                     //Allocate array for dist
   for (int p=0; p<gridsize; p++) dist[p]=gridsize; //Initialize dist values
 
-  computeDistances2D(image,myshape,p2,dist,xsize,ysize);
+  computeDistances2D(image,myshape,p2,dist,image.xsize,image.ysize);
 
   //Move shape from starting point to destination via the optimal path
 
@@ -184,7 +183,6 @@ int main(int argc,char *argv[]) {
 
   //Deallocate memory
 
-  delete[] image;
   delete[] dist;
 
   return 0;
