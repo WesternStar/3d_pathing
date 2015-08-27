@@ -25,7 +25,7 @@ void computeDistances2D
 (unsigned char *obst,shape *s,int dest,int *dist,int xsize,int ysize);
 
 //Read rhombus parameters (width,height,agle) from file and pass them to object
-
+ // TODO Replace read and set params operations with istream for Rhombus 
 void readAndSetRhombusParams(ifstream &fin,rhombus *myrhom) {
   float width,height,corner_angle;
   fin >> width;        if (!fin.good()) {cout << "Invalid width\n";  exit(1);}
@@ -35,7 +35,7 @@ void readAndSetRhombusParams(ifstream &fin,rhombus *myrhom) {
 }
 
 //Read lens parameters (radius,arc_angle) from file and pass them to object
-
+ // TODO Replace read and set params operations with istream for Lens
 void readAndSetLensParams(ifstream &fin,lens *mylens) {
   float radius, arc_angle;
   fin >> radius;    if (!fin.good()) {cout << "Invalid radius\n";    exit(1);}
@@ -44,7 +44,7 @@ void readAndSetLensParams(ifstream &fin,lens *mylens) {
 }
 
 //Read capsule parameters (width,height) from file and pass them to object
-
+ // TODO Replace read and set params operations with istream for Capsule
 void readAndSetCapsuleParams(ifstream &fin,capsule *mycaps) {
   float width,height;
   fin >> width;  if (!fin.good()) {cout << "Invalid width\n";  exit(1);}
@@ -53,7 +53,7 @@ void readAndSetCapsuleParams(ifstream &fin,capsule *mycaps) {
 }
 
 //Read starting/destination location from file and return nearest grid point
-
+ // Remove read and set locations this should be handled in the istream for the shapes
 int readAndSetLocation(ifstream &fin,shape *myshape,int xsize,int ysize) {
   float x,y,theta;
   fin >> x;     if (!fin.good()) {cout << "invalid x-coordinate\n"; exit(1);}
