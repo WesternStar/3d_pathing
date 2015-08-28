@@ -2,8 +2,8 @@
 #include <fstream>  //Included for ifstream class
 #include <iostream> //Included for ostream class (cout)
 #include <memory>
-#include "../include/pgmioClass.hpp"
-#include "../include/shape.h"
+#include "pgmioClass.hpp"
+#include "shape.h"
 
 using namespace std;
 std::unique_ptr<PGMData> Field;

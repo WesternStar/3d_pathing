@@ -17,8 +17,8 @@ void computeDistances2D
   const int Y=xsize;                //Offset equivalent to 1 step in y direction
 
   //Initialize visited flags and queue
-  auto valid = [&obst,&shape](int x,int y){ shape->
-
+  //TODO this needs to use field to check the location is valid
+  auto valid = [&obst,&s](int x,int y){ s->setLocation(x,y,0); auto a=s->getPoints(); return obst->AreValidLocations(a); };
   vector<int> visited(gridsize,0);
 
   vector<int> queue(gridsize);         //Queue used to determine visiting order
@@ -32,7 +32,6 @@ void computeDistances2D
 
   //Build distance function by marching outwards from seed
 
-  // TODO write valid macro
 
 
 
