@@ -4,22 +4,23 @@
 #include <utility>
 #include <iostream>
 #include <memory>
+#include <cstddef>
 
 using std::vector;
 using std::pair;
 using std::unique_ptr;
 using std::make_unique;
-const int debug = 1;
+const int debug = 0;
 
 class PGMData {
     int xsize;
     int ysize;
-    vector<unsigned char> image;
+    vector<std::byte> image;
     FILE *Handle;
-    bool loaded = 0;
-    bool writen = 0;
 
 public:
+    bool loaded = 0;
+    bool written = 0;
     PGMData() { };
     ~PGMData() { }
 
@@ -66,7 +67,7 @@ public:
 
     // Allocate space for image data
 
-    image.reserve(xsize * ysize);
+    image.resize(xsize * ysize);
 
     // Read image data from file
 
@@ -85,6 +86,14 @@ public:
     return;
 }
 
+    void createBlank(int x, int y){
+      xsize=x;
+      ysize=y;
+      image.resize(xsize * ysize);
+      for (auto & a : image){
+        a = std::byte{255};
+      }
+    }
 
     void writeData(const char *filename){
 
@@ -104,18 +113,18 @@ public:
 
     // Write image data to file
 
-    fwrite(image.data(), sizeof(unsigned char), xsize * ysize, Handle);
+    fwrite(image.data(), sizeof(std::byte), xsize * ysize, Handle);
 
     // Close file and return
 
     fclose(Handle);
-    writen = 1;
+    written = 1;
     return;
 }
 
     bool IsValidLocation(int x, int y){
     if (debug) {
-        int opac = image[xsize * y + x];
+      int opac = std::to_integer<int>(image[xsize * y + x]);
         std::cout << "IVL: Opacity" << opac << std::endl;
         bool valid = opac != 0;
         if (valid)
@@ -125,27 +134,28 @@ public:
         return valid;
     } else {
 
-        return image[xsize * y + x] != 0;
+      return std::to_integer<int>(image[xsize * y + x]) != 0;
     }
 }
 
     bool AreValidLocations(vector<pair<int, int>> &points){
     for (auto i : points) {
-        if (IsValidLocation(i.first, i.second)) {
-        } else {
-            if (debug)
-                std::cout << "AVL:Invalid Location\n";
-            return false;
+      bool valid = IsValidLocation(i.first, i.second);
+      if(!valid){
+        if (debug){
+          std::cout << "AVL:Invalid Location\n";
         }
+        return false;
+      }
     }
     if (debug)
         std::cout << "AVL:Valid Location\n";
     return true;
-}
+    }
 
     void DrawPoint(int x, int y, int opacity){
     size_t location = xsize * y + x;
-    image[location] = opacity;
+    image[location] = std::byte(opacity);
 }
 
     void DrawPoints(vector<pair<int, int>> &points, int opacity){
@@ -157,7 +167,7 @@ public:
     void Print(){
     for (int y = 0; y < ysize; y++) {
         for (int x = 0; x < xsize; x++) {
-            if ((image[y * xsize + x]) < 64) {
+          if (std::to_integer<int>(image[y * xsize + x]) < 64) {
                 std::cout << "*";
             } else {
                 std::cout << " ";
