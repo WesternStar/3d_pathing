@@ -1,12 +1,13 @@
 #include "pgmioClass.hpp"
 #include "shape.h"
+#include <assert.h>
 #include <fstream>  //Included for ifstream class
 #include <iostream> //Included for ostream class (cout)
 #include <stdlib.h> //Included for function exit()
 
 using namespace std;
 
-#define D_THETA 10 // Angle increment (degrees) between neighboring z-indeces
+#define D_THETA 10 // Angle increment (degrees) between neighboring z-indices
 
 // Declaration of function to compute "distance to destination" shape in 3D grid
 //----------------------------------------------------------------------------
@@ -28,15 +29,28 @@ int main(int argc, char *argv[]) {
 
   int xsize{360}, ysize{360}, zsize = 360 / D_THETA;
   PGMData image;
-  image.createBlank(xsize, ysize);
-  Line A;
+  image.drawBlank(xsize, ysize);
 
-  // TODO Draw A Box
+  try {
+    // Draw A Box
+    rhombus box(90, 180, 0, 180, 90, 90);
+    image.drawPoints(box.getPoints(), 128);
 
-  // Write output image
-  image.writeData(argv[1]);
-  if (!image.written)
-    cout << "Unable to write output image: " << argv[1] << endl;
+    cout << "Drew Box\n";
+    // Draw a Lens
+    lens K(40, 180, 0, 30, 50);
+    cout << K.getPoints().size();
+    image.drawPoints(K.getPoints(), 64);
+    // Draw a Capsule
+    capsule Cap(90,300,0,10,10);
+    image.drawPoints(Cap.getPoints(), 64);
+    // Write output image
+    image.writeData(argv[1]);
+    if (!image.written)
+      cout << "Unable to write output image: " << argv[1] << endl;
+  } catch (const std::bad_alloc &e) {
+    std::cout << "Allocation failed: " << e.what() << '\n';
+  }
 
   return 0;
 }

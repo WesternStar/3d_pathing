@@ -1,30 +1,30 @@
-#include <stdio.h>
-#include <string.h>
-#include <vector>
-#include <utility>
+#include <cstddef>
 #include <iostream>
 #include <memory>
-#include <cstddef>
+#include <stdio.h>
+#include <string.h>
+#include <utility>
+#include <vector>
 
-using std::vector;
+using std::make_unique;
 using std::pair;
 using std::unique_ptr;
-using std::make_unique;
+using std::vector;
 const int debug = 0;
 
 class PGMData {
-    int xsize;
-    int ysize;
-    vector<std::byte> image;
-    FILE *Handle;
+  int xsize;
+  int ysize;
+  vector<std::byte> image;
+  FILE *Handle;
 
 public:
-    bool loaded = 0;
-    bool written = 0;
-    PGMData() { };
-    ~PGMData() { }
+  bool loaded = 0;
+  bool written = 0;
+  PGMData(){};
+  ~PGMData() {}
 
-    PGMData(const char *filename){
+  PGMData(const char *filename) {
     char line[81], word[81];
 
     // Initialize image sizes and pointer
@@ -34,8 +34,8 @@ public:
     // Open input file for reading
 
     if (!(Handle = fopen(filename, "r"))) {
-        loaded = 0;
-        return;
+      loaded = 0;
+      return;
     }
 
     // Read PGM header
@@ -43,14 +43,14 @@ public:
     fgets(line, 81, Handle);
     sscanf(line, "%s", word);
     if (strcmp(word, "P5")) {
-        fclose(Handle);
-        loaded = 0;
-        return;
+      fclose(Handle);
+      loaded = 0;
+      return;
     } // Check for PGM identifier
 
     do {
-        fgets(line, 81, Handle);
-        sscanf(line, "%s", word);
+      fgets(line, 81, Handle);
+      sscanf(line, "%s", word);
     } // Read past comments
     while (*word == '#');
 
@@ -59,10 +59,10 @@ public:
     fgets(line, 81, Handle); // Read past rest of header
 
     if (xsize <= 0 || ysize <= 0) {
-        fclose(Handle);
-        xsize = ysize = 0;
-        loaded = 0;
-        return;
+      fclose(Handle);
+      xsize = ysize = 0;
+      loaded = 0;
+      return;
     }
 
     // Allocate space for image data
@@ -73,10 +73,10 @@ public:
 
     if (fread(image.data(), sizeof(unsigned char), xsize * ysize, Handle) <
         xsize * ysize) {
-        fclose(Handle);
-        xsize = ysize = 0;
-        loaded = 0;
-        return;
+      fclose(Handle);
+      xsize = ysize = 0;
+      loaded = 0;
+      return;
     }
 
     // Close file and return
@@ -84,24 +84,15 @@ public:
     fclose(Handle);
     loaded = 1;
     return;
-}
+  }
 
-    void createBlank(int x, int y){
-      xsize=x;
-      ysize=y;
-      image.resize(xsize * ysize);
-      for (auto & a : image){
-        a = std::byte{255};
-      }
-    }
-
-    void writeData(const char *filename){
+  void writeData(const char *filename) {
 
     // Open output file for writing
 
     if (!(Handle = fopen(filename, "w"))) {
-        throw;
-        return;
+      throw;
+      return;
     }
 
     // Write PGM header
@@ -120,72 +111,95 @@ public:
     fclose(Handle);
     written = 1;
     return;
-}
+  }
 
-    bool IsValidLocation(int x, int y){
+  bool isValidLocation(int x, int y) {
     if (debug) {
       int opac = std::to_integer<int>(image[xsize * y + x]);
-        std::cout << "IVL: Opacity" << opac << std::endl;
-        bool valid = opac != 0;
-        if (valid)
-            std::cout << "IVL:Valid Location\n";
-        else
-            std::cout << "IVL:Invalid Location\n";
-        return valid;
+      std::cout << "IVL: Opacity" << opac << std::endl;
+      bool valid = opac != 0;
+      if (valid)
+        std::cout << "IVL:Valid Location\n";
+      else
+        std::cout << "IVL:Invalid Location\n";
+      return valid;
     } else {
 
       return std::to_integer<int>(image[xsize * y + x]) != 0;
     }
-}
+  }
 
-    bool AreValidLocations(vector<pair<int, int>> &points){
+  bool areValidLocations(vector<pair<int, int>> &points) {
     for (auto i : points) {
-      bool valid = IsValidLocation(i.first, i.second);
-      if(!valid){
-        if (debug){
+      bool valid = isValidLocation(i.first, i.second);
+      if (!valid) {
+        if (debug) {
           std::cout << "AVL:Invalid Location\n";
         }
         return false;
       }
     }
     if (debug)
-        std::cout << "AVL:Valid Location\n";
+      std::cout << "AVL:Valid Location\n";
     return true;
+  }
+  // This takes areValidLocations and treats a given location as the (0,0) point
+  bool areValidLocationsAtLoc(vector<pair<int, int>> &points, pair<int,int> location) {
+    for (auto i : points) {
+      bool valid = isValidLocation(i.first+location.first, i.second+location.second);
+      if (!valid) {
+        if (debug) {
+          std::cout << "AVL:Invalid Location\n";
+        }
+        return false;
+      }
     }
+    if (debug)
+      std::cout << "AVL:Valid Location\n";
+    return true;
+  }
 
-    void DrawPoint(int x, int y, int opacity){
+  void drawBlank(int x, int y) {
+    xsize = x;
+    ysize = y;
+    image.resize(xsize * ysize);
+    for (auto &a : image) {
+      a = std::byte{255};
+    }
+  }
+
+  void drawPoint(int x, int y, int opacity) {
     size_t location = xsize * y + x;
     image[location] = std::byte(opacity);
-}
+  }
 
-    void DrawPoints(vector<pair<int, int>> &points, int opacity){
+  void drawPoints(const vector<pair<int, int>> &points, int opacity) {
     for (auto i : points) {
-        DrawPoint(i.first, i.second, opacity);
+      drawPoint(i.first, i.second, opacity);
     }
-}
+  }
 
-    void Print(){
+  // This takes drawPoints and treats a given location as the (0,0) point
+  void drawPointsAtLoc(const vector<pair<int,int>> &points,int opacity, pair<int,int> location){
+    for (auto i : points) {
+      drawPoint(i.first+location.first, i.second+location.second, opacity);
+    }
+  }
+
+  void Print() {
     for (int y = 0; y < ysize; y++) {
-        for (int x = 0; x < xsize; x++) {
-          if (std::to_integer<int>(image[y * xsize + x]) < 64) {
-                std::cout << "*";
-            } else {
-                std::cout << " ";
-            }
+      for (int x = 0; x < xsize; x++) {
+        if (std::to_integer<int>(image[y * xsize + x]) < 64) {
+          std::cout << "*";
+        } else {
+          std::cout << " ";
         }
-        std::cout << "\n";
+      }
+      std::cout << "\n";
     }
-}
+  }
 
-    int xSize() { return xsize; }
+  int xSize() { return xsize; }
 
-    int ySize() { return ysize; }
+  int ySize() { return ysize; }
 };
-
-
-
-
-
-
-
-
