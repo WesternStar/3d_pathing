@@ -29,7 +29,6 @@ public:
   // in the case of our shapes without a rotation cache we don't do any changes
   // of theta at all
   virtual void setLocation(double x, double y, double theta) {
-    location = make_pair(static_cast<int>(x), static_cast<int>(y));
     relative.first = x - location.first;
     relative.second = y - location.second;
     this->theta = (theta / 180.0) * M_PI;

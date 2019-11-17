@@ -11,6 +11,8 @@ using std::pair;
 using std::unique_ptr;
 using std::vector;
 const int debug = 0;
+// The minimum darkness necessary to be considered blocking another shape
+const int invalid = 64;
 
 class PGMData {
   int xsize;
@@ -114,18 +116,18 @@ public:
   }
 
   bool isValidLocation(int x, int y) {
+    auto valid=[](int val){return val > invalid;};
     if (debug) {
       int opac = std::to_integer<int>(image[xsize * y + x]);
       std::cout << "IVL: Opacity" << opac << std::endl;
-      bool valid = opac != 0;
-      if (valid)
+      bool validated = valid(opac);
+      if (validated)
         std::cout << "IVL:Valid Location\n";
       else
         std::cout << "IVL:Invalid Location\n";
       return valid;
     } else {
-
-      return std::to_integer<int>(image[xsize * y + x]) != 0;
+      return valid(std::to_integer<int>(image[xsize * y + x]));
     }
   }
 
