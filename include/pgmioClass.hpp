@@ -125,7 +125,7 @@ public:
         std::cout << "IVL:Valid Location\n";
       else
         std::cout << "IVL:Invalid Location\n";
-      return valid;
+      return validated;
     } else {
       return valid(std::to_integer<int>(image[xsize * y + x]));
     }
@@ -136,7 +136,7 @@ public:
       bool valid = isValidLocation(i.first, i.second);
       if (!valid) {
         if (debug) {
-          std::cout << "AVL:Invalid Location\n";
+          std::cout << "AVL:Invalid Location" <<i.first <<i.second<< "\n";
         }
         return false;
       }
