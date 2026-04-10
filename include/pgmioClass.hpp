@@ -116,6 +116,7 @@ public:
   }
 
   bool isValidLocation(int x, int y) {
+    if (x < 0 || x >= xsize || y < 0 || y >= ysize) return false;
     auto valid=[](int val){return val > invalid;};
     if (debug) {
       int opac = std::to_integer<int>(image[xsize * y + x]);

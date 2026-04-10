@@ -166,8 +166,8 @@ public:
     this->radius = radius;
     this->angle = (angle / 180.0) * M_PI;
     separation = 2 * radius * cos(this->angle / 2.0);
-    v_unit.first = cos(theta + (this->angle / 2.0));
-    v_unit.second = sin(theta + (this->angle / 2.0));
+    v_unit.first = cos(this->theta + (this->angle / 2.0));
+    v_unit.second = sin(this->theta + (this->angle / 2.0));
     A = Arc(static_cast<int>(this->x()), static_cast<int>(this->y()), theta,
             radius, angle);
     B = Arc(static_cast<int>(this->x()) + v_unit.first * separation,
@@ -197,7 +197,7 @@ public:
       : shape(x, y, theta) {
     this->width = width;
     this->height = height;
-    C = Line(x, y, this->theta, width);
+    C = Line(x, y, theta, width);
     D = Line(x + width * cos(this->theta) - height * sin(this->theta),
              y + width * sin(this->theta) + height * cos(this->theta),
              theta + 180, width);
@@ -221,21 +221,26 @@ public:
   };
 };
 
-template <class Shape, int N> class Rotation : shape {
-  int R = 360 / N;
+template <class Shape, int N> class Rotation : public shape {
+  static constexpr int R = 360 / N;
   vector<Shape> rotations;
-  Shape &current;
-  template <typename... Types> Rotation() {}
+  Shape *current = nullptr;
+
+public:
   template <class... Ts>
   Rotation(int x, int y, double theta, Ts... args) : shape(x, y, theta) {
-    for (int i = 0; i < 360; i = i + R) {
-      rotations.emplace_back(x, y, theta + i, args...);
+    for (int i = 0; i < 360; i += R) {
+      rotations.emplace_back(x, y, static_cast<double>(i), args...);
     }
+    current = &rotations[static_cast<int>(theta) / R];
   }
+
   void setLocation(double x, double y, double theta) override {
     shape::setLocation(x, y, theta);
-    current = rotations[static_cast<int>(theta) / N];
-    this->theta = (theta / 180.0) * M_PI;
+    current = &rotations[static_cast<int>(theta) / R];
   }
-  virtual const vector<pair<int, int>> &getPoints() { current.getPoints(); };
+
+  const vector<pair<int, int>> &getPoints() const override {
+    return current->getPoints();
+  }
 };

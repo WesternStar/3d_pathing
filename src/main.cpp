@@ -101,33 +101,32 @@ int main(int argc, char *argv[]) {
 
   // Get shape parameters from input file
 
-  shape *myshape; // Base pointer to one of the derived shape objects
-  unique_ptr<rhombus> myrhom;
-  unique_ptr<lens>    mylens;
-  unique_ptr<capsule> mycaps;
+  unique_ptr<shape> myshape;
 
   auto [x, y, theta] = readAndSetLocation(fin); // Starting point
 
   switch (shapetype) {
   case 'R': {
     auto [width, height, corner_angle] = readAndSetRhombusParams(fin);
-    myrhom = make_unique<rhombus>(x, y, theta * D_THETA, width, height, corner_angle);
-    myshape = myrhom.get();
+    myshape = make_unique<Rotation<rhombus, 360/D_THETA>>(
+      (int)x, (int)y, 0.0, (int)width, (int)height, corner_angle);
   } break;
   case 'L': {
     auto [radius, arc_angle] = readAndSetLensParams(fin);
-    mylens = make_unique<lens>(x, y, theta * D_THETA, radius, arc_angle);
-    myshape = mylens.get();
+    myshape = make_unique<Rotation<lens, 360/D_THETA>>(
+      (int)x, (int)y, 0.0, radius, arc_angle);
   } break;
   case 'C': {
     auto [width, height] = readAndSetCapsuleParams(fin);
-    mycaps = make_unique<capsule>(x, y, theta * D_THETA, width, height);
-    myshape = mycaps.get();
+    myshape = make_unique<Rotation<capsule, 360/D_THETA>>(
+      (int)x, (int)y, 0.0, (int)width, (int)height);
   } break;
   default:
     cout << "Unrecognized shape type\n";
     exit(1);
   }
+
+  myshape->setLocation(x, y, theta * D_THETA); // select correct starting rotation
 
   auto [x2, y2, theta2] = readAndSetLocation(fin); // Destination point
 
@@ -177,7 +176,7 @@ int main(int argc, char *argv[]) {
   for (int p = 0; p < gridsize; p++) dist[p] = gridsize; // Initialize dist values
 
   cout << "Initialized distance array\n";
-  computeDistances(&image, myshape, end, dist, image.xSize(), image.ySize(), zsize);
+  computeDistances(&image, myshape.get(), end, dist, image.xSize(), image.ySize(), zsize);
   cout << "Computed distances\n";
 
   // Move shape from starting point to destination via the optimal path
